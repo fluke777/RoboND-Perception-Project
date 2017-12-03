@@ -139,17 +139,10 @@ def pcl_callback(pcl_msg):
     cloud_filtered = filter_outliers(cloud_filtered, 10, 0.1)
     # Remove noise. It is akin to white noise so it can be effectively removed by means of statistical analysis
     # Much like the previous filters, we start by creating a filter object: 
-    outlier_filter = cloud_filtered.make_statistical_outlier_filter()
-    # Set the number of neighboring points to analyze for any given point
-    outlier_filter.set_mean_k(10)
-    # Set threshold scale factor
-    # Any point with a mean distance larger than global (mean distance+x*std_dev) will be considered outlier
-    outlier_filter.set_std_dev_mul_thresh(0.1)
-    # Finally call the filter function for magic
-    cloud_filtered = outlier_filter.filter()
+    tracer_cloud = cloud_filtered
 
     # Voxel Grid Downsampling
-    cloud_filtered = filter_voxel(cloud_filtered, 0,005)
+    cloud_filtered = filter_voxel(cloud_filtered, 0.005)
 
     # PassThrough Filtering
     # We make three filters along each axis
@@ -204,7 +197,7 @@ def pcl_callback(pcl_msg):
 
     # Convert PCL data to ROS messages
     # pc after pipeline without RANSAC
-    ros_cloud_filtered = pcl_to_ros(cloud_filtered)
+    ros_tracer_cloud = pcl_to_ros(tracer_cloud)
     # objects
     ros_cloud_objects = pcl_to_ros(extracted_outliers)
     # table
@@ -213,7 +206,7 @@ def pcl_callback(pcl_msg):
     ros_cluster_cloud = pcl_to_ros(cluster_cloud)
 
     # publish the clouds
-    my_cloud_pub.publish(ros_cloud_filtered)
+    my_cloud_pub.publish(ros_tracer_cloud)
     pcl_table_pub.publish(ros_cloud_table)
     pcl_objects_pub.publish(ros_cloud_objects)
     pcl_cluster_pub.publish(ros_cluster_cloud)
@@ -235,7 +228,7 @@ def pcl_callback(pcl_msg):
         # Extract histogram features
         chists = compute_color_histograms(sample_cloud, using_hsv=True)
         normals = get_normals(sample_cloud)
-	    nhists = compute_normal_histograms(normals)
+        nhists = compute_normal_histograms(normals)
         feature = np.concatenate((chists, nhists))
 
         # Make the prediction, retrieve the label for the result
@@ -298,10 +291,10 @@ def pr2_mover(object_list):
     for item in object_list_param:
         # Get the PointCloud for a given object and obtain it's centroid
         name = item['name']
-	    object = filter(lambda o: o.label == name, object_list)[0]
+        object = filter(lambda o: o.label == name, object_list)[0]
         labels.append(name)
         groups.append(item['group'])
-	    points_arr = ros_to_pcl(object.cloud).to_array()
+        points_arr = ros_to_pcl(object.cloud).to_array()
         centroids.append(np.mean(points_arr, axis=0)[:3])
  
     # we need to retype the centroids to a different datatype that ROS can understand
@@ -330,7 +323,7 @@ def pr2_mover(object_list):
         place_pose.position.y = place_pos_data[1]
         place_pose.position.z = place_pos_data[2]
 
-	    yaml_dict = make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose)
+        yaml_dict = make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose)
         dict_list.append(yaml_dict)
     
 
