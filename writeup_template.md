@@ -1,5 +1,4 @@
 ## Project: Perception Pick & Place
-### Writeup Template: You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
 
 ---
 
@@ -25,7 +24,6 @@
 13. Looking for a bigger challenge?  Load up the `challenge.world` scenario and see if you can get your perception pipeline working there!
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/1067/view) Points
-### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
 ---
 ### Writeup / README
@@ -36,18 +34,21 @@ You're reading it!
 
 ### Exercise 1, 2 and 3 pipeline implemented
 #### 1. Complete Exercise 1 steps. Pipeline for filtering and RANSAC plane fitting implemented.
-In this step we are trying to solve the following problem. We have th scene represented as a point cloud but there is a lot of spurious data. In the end we are interested in the objects on the table. We also have table, some background, possibly noise. Here we design a set of operations to extract only the points we are interested in. That is the points of the objects on the table. We will do it in these steps.
+In this step we are trying to solve the following problem. We have th scene represented as a point cloud but there is a lot of spurious data. In the end we are interested in the objects on the table. We also have table, some background, possibly noise. Here we design a set of operations to extract only the points we are interested in. That is the points of the objects on the table. We will do it in these steps (the links lead to github to the commented code).
 
 - We start with a noisy scene
 	![Noisy PC](images/pipeline_with_noise.png =600x)
 
-- We remove the noise
+- [We remove the noise](https://github.com/fluke777/RoboND-Perception-Project/blob/master/pr2_robot/scripts/project_template.py#L101-L111)
 	![Denoised PC](images/pipeline_no_noise.png =600x)
 
-- perform passfilters. This effectively cuts a box like shape from the space. We perform passes along z and y lane. We aim to remove pieces of the table
+- [We downsample the point cloud](https://github.com/fluke777/RoboND-Perception-Project/blob/master/pr2_robot/scripts/project_template.py#L66-L73)
+	![Voxels](images/pipeline_down_sampled.png =600x)
+
+- [perform passfilters](https://github.com/fluke777/RoboND-Perception-Project/blob/master/pr2_robot/scripts/project_template.py#L55-L64). This effectively cuts a box like shape from the space. We perform passes along z and y lane. We aim to remove pieces of the table
 	![Trimmed PC](images/pipeline_trimmed.png =600x)
 
-- RANSAC detection on plane. We try to remove the table
+- [RANSAC detection on plane](https://github.com/fluke777/RoboND-Perception-Project/blob/master/pr2_robot/scripts/project_template.py#L75-L99). We try to remove the table
 	- Inliers (the table)
  	![Inliers PC](images/pipeline_inliers.png =600x)
 	- Outliers (the table)
@@ -62,13 +63,11 @@ This is the picture of showing the colored clusters
 ![Outliers PC](images/pipeline_clusters.png =600x)
 
 #### 3. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
-Now we are going to train a classifier. We are sticking with the default SVM. We are showing the confusion matrix which represents the performance of the multiclass classification in a concise and visual manner.
+Now we are going to train a classifier. We are sticking with the default SVM. We are showing the confusion matrix which represents the performance of the multiclass classification in a concise and visual manner (for brevity confusion matrix is provided and discussed only for the world 3 which is most complex).
 
 ![Confusion matrix](images/normalized_confusion_matrix.png =600x)
 
 Here we see that the performance is decent most of the objects is correctly classified with accuracy over 90 percent. Worse performance can be seen on create that gets misclassified as bowl as much as in 20 percent of cases. Here the feature was generated on 300 snapshots of each object.
-
-![Outliers PC](images/perception_detection_3.png =600x)
 
 ### Pick and Place Setup
 
@@ -87,10 +86,34 @@ The steps needed to perform the task in my case are as follows
 - execute `roslaunch pr2_robot pick_place_project.launch`
 - execute `rosrun pr2_robot project_template.py` in the second window
 
-And here's another image! 
-![demo-2](images/perception_detection_2.png =600x)
+Here are the results for the respective worlds
 
-Spend some time at the end to discuss your code, what techniques you used, what worked and why, where the implementation might fail and how you might improve it if you were going to pursue this project further.  
+- World 1
+![detected and labeled cloud](images/perception_detection_1.png =600x)
+
+- World 2
+![detected and labeled cloud](images/perception_detection_2.png =600x)
+
+- World 2
+![detected and labeled cloud](images/perception_detection_3.png =600x)
+
+The yaml files with the messages are [here](https://github.com/fluke777/RoboND-Perception-Project/tree/master/pr2_robot/yaml).
+
+### Discussion
+The implementation went fairly smoothly. The PCL library si fantastic and contains majority of tools we need. I had to alter the pipeline a little bit. I had troubles with isolating the table with just the RANSAC but that is fine. Every project is different and there are many paths to the result.
+
+Another problem is the detection itself. As seen on the confusion matrix the classifier performs really well during training but the performance drops once put into RVIZ. I think there needs to be done further work on tuning the hyperparameters. I tried the following
+
+- Switch to HSV
+- I did more snapshots per object which helped but the caveat is longer training
+
+Each of these improved the performance
+
+- What I think could help is try changing couple of different classifiers
+
+In the last world we can see there are 2 misclassifications. One is the glue but it is partially ocluded plus it has similar shape and colors like the soap. The other misclassification is the eraser. While similar in shape to buscuits it has very different colot palette.
 
 
 
+
+		
