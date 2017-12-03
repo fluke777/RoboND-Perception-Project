@@ -36,17 +36,38 @@ You're reading it!
 
 ### Exercise 1, 2 and 3 pipeline implemented
 #### 1. Complete Exercise 1 steps. Pipeline for filtering and RANSAC plane fitting implemented.
+In this step we are trying to solve the following problem. We have th scene represented as a point cloud but there is a lot of spurious data. In the end we are interested in the objects on the table. We also have table, some background, possibly noise. Here we design a set of operations to extract only the points we are interested in. That is the points of the objects on the table. We will do it in these steps.
+
+- perform passfilters. This effectively cuts a box like shape from the space. We perform 2 passes along z and y lane. We aim to remove pieces of the table.
+- RANSAC detection on plane. We try to remove the table
 
 #### 2. Complete Exercise 2 steps: Pipeline including clustering for segmentation implemented.  
 
-#### 2. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
-Here is an example of how to include an image in your writeup.
+In this step we completed the clustering of points. The reason for this is that after first step we have only points of interest but they are still part of one point could. Now we try to segment them into individual point clouds ideally representing individual objects. For that we are using Euclidean Clustering (DBSCAN). It is briefly described [here](https://classroom.udacity.com/nanodegrees/nd209/parts/586e8e81-fc68-4f71-9cab-98ccd4766cfe/modules/e5bfcfbd-3f7d-43fe-8248-0c65d910345a/lessons/2cc29bbd-5c51-4c3e-b238-1282e4f24f42/concepts/f3abc339-1d6d-42b6-9178-67e3e37eba19).
+
+#### 3. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
+Now we are going to train a classifier. We are sticking with the default SVM. We are showing the confusion matrix which represents the performance of the multiclass classification in a concise and visual manner.
+
+Here we see that the performance is decent most of the objects is correctly classified with accuracy over 90 percent. Worse performance can be seen on create that gets misclassified as bowl as much as in 20 percent of cases. Here the feature was generated on 300 snapshots of each object.
 
 ![demo-1](https://user-images.githubusercontent.com/20687560/28748231-46b5b912-7467-11e7-8778-3095172b7b19.png)
 
 ### Pick and Place Setup
 
 #### 1. For all three tabletop setups (`test*.world`), perform object recognition, then read in respective pick list (`pick_list_*.yaml`). Next construct the messages that would comprise a valid `PickPlace` request output them to `.yaml` format.
+
+Here we are going to apply our model to the pipeline and generate messages that can be used for either instructing robot to pick and place projects or to generate messages to persist.
+
+The steps needed to perform the task in my case are as follows
+- open 2 terminal window.
+	- one does not really matter where. Be sure to have GAZEBO_MODEL_PATH exported correctly
+	- second place into directory `/home/robond/catkin_ws/src/RoboND-Perception-Project/pr2_robot/scripts`
+- 
+- in the second window copy the model to the working directory `cp ../trained_models/model_3.sav .`
+- change world_name variable on line 27 in project_template.py to have the number of the world you are about to explore in our case here 
+	world_name = 3
+- execute `roslaunch pr2_robot pick_place_project.launch`
+- execute `rosrun pr2_robot project_template.py` in the second window
 
 And here's another image! 
 ![demo-2](https://user-images.githubusercontent.com/20687560/28748286-9f65680e-7468-11e7-83dc-f1a32380b89c.png)
