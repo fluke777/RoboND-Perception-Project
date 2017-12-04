@@ -29,7 +29,7 @@ import yaml
 # To be honest I am not sure if this could be somehow read in from param server
 # I assume yes but I have not figured out the way how to do it yet
 # If we figure this out it can be automated even further
-world_name = 3
+world_name = 1
 
 # Helper function to get surface normals
 def get_normals(cloud):
@@ -291,7 +291,13 @@ def pr2_mover(object_list):
     for item in object_list_param:
         # Get the PointCloud for a given object and obtain it's centroid
         name = item['name']
-        object = filter(lambda o: o.label == name, object_list)[0]
+        print name
+        print map(lambda o: o.label, object_list)
+        objects = filter(lambda o: o.label == name, object_list)
+        if (not objects):
+            continue
+     
+        object = objects[0]
         labels.append(name)
         groups.append(item['group'])
         points_arr = ros_to_pcl(object.cloud).to_array()
