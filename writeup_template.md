@@ -69,7 +69,7 @@ To be able to train a classifier we have to first prepare the features. This hap
 - [normal histogram](https://github.com/fluke777/RoboND-Perception-Project/blob/master/pr2_robot/scripts/features.py#L55-L82)
 
 And serialize to a file with a label which is later used for training.
-Now we are going to train a classifier. We are sticking with the default SVM. We are showing the confusion matrix which represents the performance of the multiclass classification in a concise and visual manner (for brevity confusion matrix is provided and discussed only for the world 3 which is most complex).
+Now we are going to train a classifier. We are sticking with the default SVM. We are showing the confusion matrix which represents the performance of the multiclass classification in a concise and visual manner.
 
 ![Confusion matrix](images/normalized_confusion_matrix.png =600x)
 
