@@ -63,6 +63,12 @@ This is the picture of showing the colored clusters
 ![Outliers PC](images/pipeline_clusters.png =600x)
 
 #### 3. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
+To be able to train a classifier we have to first prepare the features. This happens roughly like this. The object "image" is captured in a simulator by rotating randomly an object in fron of camera. We then preprocess it with a script that captures 2 histograms.
+
+- [color histogram](https://github.com/fluke777/RoboND-Perception-Project/blob/master/pr2_robot/scripts/features.py#L13-L52)
+- [normal histogram](https://github.com/fluke777/RoboND-Perception-Project/blob/master/pr2_robot/scripts/features.py#L55-L82)
+
+And serialize to a file with a label which is later used for training.
 Now we are going to train a classifier. We are sticking with the default SVM. We are showing the confusion matrix which represents the performance of the multiclass classification in a concise and visual manner (for brevity confusion matrix is provided and discussed only for the world 3 which is most complex).
 
 ![Confusion matrix](images/normalized_confusion_matrix.png =600x)
@@ -93,8 +99,8 @@ Here are the results for the respective worlds
 
 - World 2
 ![detected and labeled cloud](images/perception_detection_2.png =600x)
-
-- World 2
+	
+- World 3
 ![detected and labeled cloud](images/perception_detection_3.png =600x)
 
 The yaml files with the messages are [here](https://github.com/fluke777/RoboND-Perception-Project/tree/master/pr2_robot/yaml).
